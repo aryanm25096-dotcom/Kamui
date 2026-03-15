@@ -1,0 +1,364 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --purple:       #5b21b6;
+  --purple-mid:   #7c3aed;
+  --purple-light: #a78bfa;
+  --white:        #fafaf9;
+  --ink:          #1a1014;
+  --cream:        #f0ebe1;
+  --red:          #c0392b;
+  --black:        #111111;
+  --silver:       #c0c0c0;
+  
+  --frame-w:      38vw;
+  --frame-h:      82vh;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  background: var(--white);
+  font-family: 'Shippori Mincho', serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── GLOBALS & UTILS ─── */
+.fullscreen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  overflow: hidden;
+}
+.bg-white { background-color: var(--white); }
+.bg-red   { background-color: var(--red); }
+.bg-black { background-color: var(--black); }
+.bg-silver{ background-color: var(--silver); }
+
+.tc-white { color: var(--white); }
+.tc-ink   { color: var(--ink); }
+.tc-red   { color: var(--red); }
+
+.flex-center     { display: flex; align-items: center; justify-content: center; }
+.flex-col-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.flex-row        { display: flex; flex-direction: row; }
+.flex-grow       { flex-grow: 1; }
+.w-full          { width: 100%; }
+.h-full          { height: 100%; }
+.relative        { position: relative; }
+.z-1             { z-index: 1; }
+.z-2             { z-index: 2; }
+.mt-8            { margin-top: 2rem; }
+.bebas           { font-family: 'Bebas Neue', sans-serif; }
+.shippori        { font-family: 'Shippori Mincho', serif; }
+
+/* ─── CUSTOM CURSOR ─── */
+#cur  { position:fixed;width:10px;height:10px;background:var(--purple);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply; }
+#cur2 { position:fixed;width:32px;height:32px;border:1.5px solid var(--purple-mid);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .1s ease,top .1s ease;opacity:.55; }
+
+/* Ripple */
+.ripple {
+  position:fixed;
+  border-radius:50%;
+  border:1px solid rgba(124,58,237,.18);
+  transform:translate(-50%,-50%) scale(0);
+  animation:rp .9s ease-out forwards;
+  pointer-events:none;
+  z-index:9989;
+}
+@keyframes rp { to { transform:translate(-50%,-50%) scale(8); opacity:0; } }
+
+/* Grain overlay */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+  opacity:.045;
+  pointer-events:none;
+  z-index:9990;
+}
+.svg-defs { position:absolute;width:0;height:0;overflow:hidden; }
+
+/* ─── SCROLL CONTAINER ─── */
+#scroll-root { height: 400vh; position: relative; }
+#sticky { position: sticky; top: 0; height: 100vh; width: 100vw; overflow: hidden; background: var(--white); }
+
+/* ─── SCROLL PROGRESS indicator ─── */
+#prog { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: .4; z-index: 999; transition: opacity .4s; }
+#prog span { font-family: 'Bebas Neue', sans-serif; font-size: .75rem; letter-spacing: .4em; color: #444; }
+#prog-bar { width: 1px; background: #777; transition: height .1s; }
+
+/* ─── NAVBAR ─── */
+.navbar { position: absolute; top: 30px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 52px; z-index: 50; }
+.nav-word { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: .3em; color: var(--ink); }
+.nav-pill { width: 48px; height: 26px; border: 2px solid var(--ink); position: relative; display: flex; align-items: center; justify-content: center; }
+.nav-pill::after { content: ''; position: absolute; width: 55%; height: 1.5px; background: var(--ink); }
+
+/* ─── PAGE 1 & 2 HERO COMPONENTS ─── */
+#frame-outer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: var(--frame-w); height: var(--frame-h); z-index: 10; }
+#frame-border { position: absolute; inset: 0; border: 8px solid var(--purple); pointer-events: none; z-index: 20; }
+#frame-border::before, #frame-border::after { content: ''; position: absolute; width: 22px; height: 22px; }
+#frame-border::before { top: -4px; left: -4px; border-top: 4px solid var(--purple-light); border-left: 4px solid var(--purple-light); }
+#frame-border::after { bottom: -4px; right: -4px; border-bottom: 4px solid var(--purple-light); border-right: 4px solid var(--purple-light); }
+#frame-label { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; z-index: 25; pointer-events: none; }
+#label-ka { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; font-weight: 900; letter-spacing: .08em; color: var(--purple); transform: translateX(-100%); padding-right: 2px; white-space: nowrap; }
+#label-mui { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; font-weight: 900; letter-spacing: .08em; color: var(--white); background: var(--purple); padding: 2px 6px 2px 4px; white-space: nowrap; line-height: 1; }
+#clip-container { position: absolute; inset: 0; overflow: hidden; clip-path: inset(0 0 0 60%); }
+.scene { position: absolute; inset: 0; background: var(--cream); }
+.sky { position: absolute; top: 0; left: 0; right: 0; height: 58%; background: linear-gradient(180deg,#ddd4f0 0%,#c9bde8 45%,#ece5d8 100%); }
+.ground { position: absolute; bottom: 0; left: 0; right: 0; height: 45%; background: #c8be9f; }
+
+#house { position: absolute; left: 50%; transform: translateX(-50%); width: 200px; bottom: -60px; z-index: 5; }
+.chimney { position: absolute; top: -32px; right: 38px; width: 20px; height: 36px; background: #3b1e6a; z-index: 3; }
+.roof { position: relative; width: 0; height: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-bottom: 80px solid #4c2080; z-index: 2; }
+.roof-inner { position: absolute; top: 12px; left: -72px; width: 0; height: 0; border-left: 72px solid transparent; border-right: 72px solid transparent; border-bottom: 68px solid #6d35a8; }
+.rays { position: absolute; bottom: 0; left: 50%; width: 1px; height: 1px; transform: translateX(-50%); }
+.ray { position: absolute; bottom: 0; left: 0; width: 1px; background: linear-gradient(to top, rgba(167,139,250,.35), transparent); transform-origin: bottom center; }
+.ray:nth-child(1){height:130px;transform:rotate(-75deg);} .ray:nth-child(2){height:140px;transform:rotate(-50deg);}
+.ray:nth-child(3){height:145px;transform:rotate(-25deg);} .ray:nth-child(4){height:148px;transform:rotate(-8deg);}
+.ray:nth-child(5){height:148px;transform:rotate(8deg);}    .ray:nth-child(6){height:145px;transform:rotate(25deg);}
+.ray:nth-child(7){height:140px;transform:rotate(50deg);}   .ray:nth-child(8){height:130px;transform:rotate(75deg);}
+.hbody { width: 148px; height: 90px; background: #ede0fc; margin: 0 auto; border: 2px solid #b89ad4; position: relative; }
+.win { position: absolute; top: 18px; width: 24px; height: 20px; background: #c9b4e8; border: 2px solid #9a75c7; }
+.win.l { left: 16px; } .win.r { right: 16px; }
+.door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 26px; height: 40px; background: #6835a8; border-radius: 13px 13px 0 0; }
+#path-wrap { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; overflow: hidden; z-index: 4; }
+
+/* PAGE 2 Components */
+.scene2 { position: absolute; inset: 0; background: var(--cream); overflow: hidden; }
+.sky2 { position: absolute; top:0;left:0;right:0; height:55%; background:linear-gradient(180deg,#d4c8ee 0%,#c0b2e2 50%,#e8e0d0 100%); }
+.ground2 { position:absolute; bottom:0;left:0;right:0; height:48%; background:#c2b892; }
+.house2 { position:absolute; left:50%; bottom:42%; transform:translateX(-50%); width:200px; }
+.path2 { position:absolute; bottom:0;left:50%; transform:translateX(-50%); }
+
+.huge-title {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15vw; /* very large */
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+/* ─── PAGE 3: TEXT LAYOUT ─── */
+.text-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 80%;
+  margin: 0 auto;
+  gap: 60px;
+  align-items: center;
+  height: 100%;
+}
+.text-block { max-width: 250px; }
+.text-block h3 { margin-bottom: 12px; font-size: 1.5rem; letter-spacing: 0.15em; color: var(--ink); }
+.text-block p { font-size: 0.95rem; line-height: 1.6; color: #555; }
+.align-left { text-align: left; }
+.align-center { text-align: center; margin: 0 auto; }
+.align-right { text-align: right; margin-left: auto; }
+
+/* ─── PAGE 4: RED IDENTITY BLOCK ─── */
+.kamui-hero {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20vw;
+  line-height: 0.8;
+  letter-spacing: 0.02em;
+}
+
+/* ─── PAGE 5 & 6: COLOR SHADES ─── */
+.split-vertical {
+  display: flex;
+  flex-direction: column;
+}
+.half {
+  flex: 1;
+  width: 100%;
+}
+.row-flex {
+  display: flex;
+  width: 100%;
+}
+.swatch {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 30px;
+}
+.hex {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+}
+.label-white {
+  font-family: 'Shippori Mincho', serif;
+  color: var(--white);
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+}
+.shades-row {
+  display: flex;
+  height: 30%; /* bottom 30% of screen */
+}
+
+/* ─── PAGE 7: SILVER/GRAY BLOCK ─── */
+.silver-layout {
+  width: 50vw;
+  height: 50vh;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+}
+.swatch-xl {
+  flex: 2;
+  position: relative;
+}
+.swatch-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.swatch-md {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+.align-left-bottom {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
+
+/* ─── PAGE 8 & 9: TYPOGRAPHY ─── */
+.typo-grid {
+  display: flex;
+  width: 90vw;
+  justify-content: space-between;
+}
+.tc-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tc-col h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5vw;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+.tc-col span {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.wide-text { font-size: 18vw; letter-spacing: 0.1em; }
+.desc-text { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; letter-spacing: 0.2em; }
+
+/* ─── PAGE 10: DUAL BOX ─── */
+.half-box {
+  width: 50vw;
+  height: 100vh;
+}
+.kamui-large {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10vw;
+  letter-spacing: 0.05em;
+}
+.bottom-label {
+  position: absolute;
+  bottom: 40px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+}
+
+/* CSS Logo for Page 10 (Abstract representation of KAMUI) */
+.css-logo-abstract {
+  width: 300px;
+  height: 300px;
+  position: relative;
+}
+.line {
+  position: absolute;
+  background: var(--white);
+}
+.l-vert { left: 40px; top: 40px; width: 12px; height: 220px; }
+.l-diag-1 { left: 52px; top: 110px; width: 12px; height: 160px; transform: rotate(-35deg); transform-origin: top left; }
+.l-diag-2 { left: 52px; top: 110px; width: 12px; height: 180px; transform: rotate(45deg); transform-origin: top left; }
+.m-1 { left: 160px; top: 100px; width: 12px; height: 160px; transform: rotate(-15deg); }
+.m-2 { left: 210px; top: 100px; width: 12px; height: 160px; transform: rotate(15deg); }
+.i-dot { left: 260px; top: 80px; width: 12px; height: 12px; }
+.i-stem { left: 260px; top: 110px; width: 12px; height: 150px; }
+
+/* ─── PAGE 11: THREE BOXES ─── */
+.collage-container { position: relative; width: 600px; height: 500px; }
+.collage-box { position: absolute; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.box-gray { bottom: 0; left: 0; width: 100%; height: 200px; background: var(--silver); z-index: 1; }
+.box-red-1 { top: 40px; left: 80px; width: 200px; height: 300px; background: var(--red); z-index: 2; transform: rotate(-8deg); }
+.box-red-2 { top: 60px; right: 100px; width: 220px; height: 260px; background: var(--red); z-index: 3; transform: rotate(5deg); }
+
+/* ─── PAGE 12: TOOLS GRID ─── */
+.tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px 100px; }
+.tool-card { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tool-card p { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.1em; color: var(--ink); margin-top: 25px; }
+.css-icon { width: 64px; height: 64px; position: relative; border: 2px solid var(--ink); }
+.terminal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 16px; border-bottom: 2px solid var(--ink); }
+.terminal::after { content: '>'; position: absolute; top: 24px; left: 8px; font-family: monospace; font-size: 16px; font-weight: bold; color: var(--ink); }
+.browser::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 16px; border-bottom: 2px solid var(--ink); }
+.browser { border-radius: 4px; }
+.browser::after { content: ''; position: absolute; top: 5px; left: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); box-shadow: 10px 0 0 var(--ink), 20px 0 0 var(--ink); }
+.folder { border-top: none; width: 70px; height: 50px; border-radius: 0 4px 4px 4px; border: 2px solid var(--ink); border-top: none; position: relative; margin-top: 14px; }
+.folder::before { content: ''; position: absolute; top: -14px; left: -2px; width: 30px; height: 14px; border: 2px solid var(--ink); border-bottom: none; border-radius: 4px 10px 0 0; }
+.brackets { border: none; display: flex; align-items: center; justify-content: center; }
+.brackets::before { content: '<>'; font-family: 'Bebas Neue', monospace; font-size: 40px; color: var(--ink); font-weight: bold; }
+.pencil { border: none; transform: rotate(45deg); width: 20px; height: 60px; background: var(--silver); border: 2px solid var(--ink); position: relative; margin-top:10px; }
+.pencil::before { content: ''; position: absolute; top: -20px; left: -2px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--ink); }
+.layers { border: none; }
+.layers::before { content: ''; position: absolute; top: 10px; left: 10px; width: 44px; height: 44px; border: 2px solid var(--ink); background: var(--white); z-index: 2; }
+.layers::after { content: ''; position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; border: 2px solid var(--ink); background: var(--silver); z-index: 1; }
+
+/* ─── PAGE 13: STUDIO DISPLAY ─── */
+.studio-display { display: flex; flex-direction: column; align-items: center; }
+.sd-bezel { width: 500px; height: 320px; background: #e0e0e0; border-radius: 20px; padding: 16px; border: 2px solid #ccc; box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; z-index: 2; }
+.sd-screen { width: 100%; height: 100%; background: var(--white); border-radius: 8px; border: 4px solid var(--black); }
+.sd-stand { width: 80px; height: 100px; background: #d0d0d0; border-left: 2px solid #bbb; border-right: 2px solid #bbb; z-index: 1; margin-top: -20px; }
+.sd-base { width: 200px; height: 12px; background: #c0c0c0; border-radius: 4px 4px 0 0; }
+
+/* ─── PAGE 14-17: DASHBOARD CHARTS ─── */
+.chart-container { width: 600px; background: var(--white); padding: 40px; border: 2px solid var(--ink); box-shadow: 10px 10px 0 var(--silver); }
+.chart-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.1em; color: var(--ink); margin-bottom: 30px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+.dash-layout { display: flex; gap: 40px; width: 600px; }
+.dash-card { flex: 1; border: 2px solid var(--ink); padding: 30px; background: var(--white); box-shadow: 10px 10px 0 var(--silver); }
+.dash-label { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: #555; letter-spacing: 0.1em; }
+.dash-value { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; margin: 15px 0; }
+.dash-trend { font-family: 'Shippori Mincho', serif; font-size: 1rem; font-weight: bold; }
+.line-graph { height: 200px; position: relative; }
+.chart-line, .chart-line-bg { stroke-linejoin: round; stroke-linecap: round; }
+.chart-dot { position: absolute; width: 12px; height: 12px; background: var(--black); border: 2px solid var(--white); border-radius: 50%; transform: translate(-50%, -50%); }
+.red-dot { background: var(--red); }
+.bar-row { display: flex; align-items: center; margin-bottom: 20px; }
+.bar-label { width: 80px; font-family: 'Bebas Neue', sans-serif; color: var(--ink); letter-spacing:0.05em; font-size:1.1rem; }
+.bar-track { flex: 1; height: 24px; background: #eaeaea; margin: 0 20px; position: relative; }
+.bar-fill { height: 100%; }
+.bar-val { width: 40px; font-family: 'Shippori Mincho', serif; font-weight: bold; text-align: right; }
+.donut-chart { width: 240px; height: 240px; border-radius: 50%; background: conic-gradient(var(--black) 0% 62%, var(--silver) 62% 100%); position: relative; }
+.donut-hole { position: absolute; inset: 40px; border-radius: 50%; }
+
+/* ─── PAGE 18: SOCIAL ICONS ─── */
+.social-row { display: flex; gap: 30px; }
+.social-icon { width: 48px; height: 48px; border: 2px solid var(--white); border-radius: 50%; position: relative; transition: background 0.2s; }
+.icon-fb::before { content: 'f'; position: absolute; top: 8px; left: 18px; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--white); }
+.icon-tw::before { content: 't'; position: absolute; top: 10px; left: 18px; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--white); }
+.icon-ig::before { content: 'i'; position: absolute; top: 8px; left: 21px; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--white); }
+.icon-mail::before { content: 'm'; position: absolute; top: 12px; left: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--white); }
+.icon-in::before { content: 'in'; position: absolute; top: 10px; left: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--white); }
